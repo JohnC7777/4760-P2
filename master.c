@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "config.h"
 
 int main (int argc, char *argv[]) {
    //***VARIABLE DECLARATION***
    int opt;
    int slaves = 0;
-   
+   int shmid;
+   void *shmp;
+
    //***GETOPT***
    while((opt = getopt(argc, argv, "hn:c:s:i:")) != -1)
    {
@@ -37,6 +40,19 @@ int main (int argc, char *argv[]) {
             break;
       }
    }
-   
+	shmid = shmget(SHM_KEY, SHM_SIZE, SHM_PERM|IPC_CREAT);
+	if (shmid == -1) {
+		char *output = getOutputPerror();
+		perror(output);
+		return 1;
+	}
+	
+	shmp = shmat(shmid, NULL, 0);
+	if (shmp == (void *) -1) {
+		char *output = getOutputPerror();
+		perror(output);
+		return 1;
+	}  
+ 
    return 0;
 }

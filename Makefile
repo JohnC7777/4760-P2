@@ -1,4 +1,4 @@
-CC		= gcc
+C		= gcc
 CFLAGS		= -g
 TARGET		= master
 OBJECTS		= master.o
