@@ -4,10 +4,10 @@
 
 int main (int argc, char *argv[]) {
    //***VARIABLE DECLARATION***
-   
+   int slaves = 0;
    
    //***GETOPT***
-   while((opt = getopt(argc, argv, "hp:c:s:i:")) != -1)
+   while((opt = getopt(argc, argv, "hn:c:s:i:")) != -1)
    {
       switch(opt)
       {
@@ -16,20 +16,23 @@ int main (int argc, char *argv[]) {
             return 0;
             break;
             
-            case'p':
-            numProcs = atoi(optarg);
+            case'n':
+            slaves = atoi(optarg);
+            if(slaves>20){
+               printf("Slaves cannot be more than 20");
+               slaves = 0;
+               exit(0);
+            }else{
+            }
             break;
             
             case'c':
-            numChars = atoi(optarg);
             break;
             
             case's':
-            sleeptime = atoi(optarg);
             break;
             
             case'i':
-            niters = atoi(optarg);
             break;
       }
    }
