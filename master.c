@@ -13,6 +13,9 @@
 #include <sys/time.h>
 #include "config.h"
 
+public const int SHM_KEY = 777;
+public const int SHM_SIZE = 1024;
+
 int main (int argc, char *argv[]) {
    //***VARIABLE DECLARATION***
 	int opt;
@@ -20,8 +23,6 @@ int main (int argc, char *argv[]) {
 	int slaves = 0;
 	int shmid;
 	void *shmp;
-	public const int SHM_KEY = 777;
-	public const int SHM_SIZE = 1024;
 
    //***GETOPT***
 while((opt = getopt(argc, argv, "hn:t:")) != -1){
