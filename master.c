@@ -23,6 +23,8 @@ int main (int argc, char *argv[]) {
 	const int SHM_KEY = 777;
 	const int SHM_SIZE = 1024;
 	const int SHM_PERM = 0666;
+	
+	char *getOutputPerror();
 
    //***GETOPT***
 while((opt = getopt(argc, argv, "hn:t:")) != -1){
