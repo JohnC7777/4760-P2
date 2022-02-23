@@ -1,6 +1,6 @@
 CC		= gcc
 CFLAGS		= -g
-TARGET		= chain
+TARGET		= master
 OBJECTS		= master.o
 .SUFFIXES: .c .o
 
