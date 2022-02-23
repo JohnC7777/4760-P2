@@ -4,6 +4,7 @@
 
 int main (int argc, char *argv[]) {
    //***VARIABLE DECLARATION***
+   int opt;
    int slaves = 0;
    
    //***GETOPT***
