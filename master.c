@@ -20,7 +20,7 @@ int main (int argc, char *argv[]) {
             case'n':
             slaves = atoi(optarg);
             if(slaves>20){
-               printf("Slaves cannot be more than 20");
+               printf("Slaves cannot be more than 20\n");
                slaves = 0;
                exit(0);
             }else{
