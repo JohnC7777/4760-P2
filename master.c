@@ -28,6 +28,7 @@ const int SHM_PERM = 0666;
 char *getOutputPerror();
 void childTermHandler(int);
 void ctrlCHandler(int);
+void logTermination(char*);
 
 int main (int argc, char *argv[]) {
 	signal(SIGINT, ctrlCHandler);
@@ -96,3 +97,15 @@ char *getOutputPerror () {
 	strcat(output, ": Error");
 	return output;
 }
+void logTermination(char *method) {
+	time_t rawtime;
+	struct tm * timeinfo;
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	FILE *fptr = fopen("cstest", "a");
+	if (fptr == NULL) {
+		printf("Error: unable to open 'cstest' file.\n");
+		exit(0);
+	}
+	fprintf(fptr, "%d:%d:%d Program ended. Termination method: %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, method);
+}	
