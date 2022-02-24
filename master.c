@@ -19,6 +19,7 @@ int shmAllocated;
 int shmid;
 void *shmp;
 char *programName;
+int activeProcesses;
 const int SHM_KEY = 777;
 const int SHM_SIZE = 1024;
 const int SHM_PERM = 0666;
@@ -34,9 +35,11 @@ int main (int argc, char *argv[]) {
 	programName = argv[0];
 	maxTime = 100;
 	slaves = 0;
+	activeProcesses = 0;
 	int opt;
 	void *shmp;
 	int shmAllocated=0;
+	
 
    //***GETOPT***
 while((opt = getopt(argc, argv, "hn:t:")) != -1){
