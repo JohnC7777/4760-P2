@@ -13,18 +13,26 @@
 #include <sys/time.h>
 #include "config.h"
 
+int maxTime;
+int slaves;
+int shmAllocated;
+int shmid;
+void *shmp;
+const int SHM_KEY = 777;
+const int SHM_SIZE = 1024;
+const int SHM_PERM = 0666;
+
+
+char *getOutputPerror();
+
 int main (int argc, char *argv[]) {
-   //***VARIABLE DECLARATION***
-	int opt;
-	int maxTime = 100;
-	int slaves = 0;
-	int shmid;
-	void *shmp;
-	const int SHM_KEY = 777;
-	const int SHM_SIZE = 1024;
-	const int SHM_PERM = 0666;
 	
-	char *getOutputPerror();
+   //***VARIABLE DECLARATION***
+	maxTime = 100;
+	slaves = 0;
+	int opt;
+	void *shmp;
+	int shmAllocated=0;
 
    //***GETOPT***
 while((opt = getopt(argc, argv, "hn:t:")) != -1){
