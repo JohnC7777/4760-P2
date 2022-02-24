@@ -74,6 +74,18 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
  
    return 0;
 }
+void childTermHandler(int s) {
+	activeProcesses--;
+	if (activeProcesses < 1) {
+		printf("All children have terminated. Now exiting program...\n");
+		logTermination("all children terminated");
+		endProgramHandler(1);
+	}		
+}
+void ctrlCHandler(int s) {
+	logTermination("ctrl+C");
+	endProgramHandler(1);
+}
 char *getOutputPerror () {
 	char* output = strdup(programName);
 	strcat(output, ": Error");
