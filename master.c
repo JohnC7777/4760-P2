@@ -18,6 +18,7 @@ int slaves;
 int shmAllocated;
 int shmid;
 void *shmp;
+char *programName;
 const int SHM_KEY = 777;
 const int SHM_SIZE = 1024;
 const int SHM_PERM = 0666;
@@ -26,8 +27,9 @@ const int SHM_PERM = 0666;
 char *getOutputPerror();
 
 int main (int argc, char *argv[]) {
-	
-   //***VARIABLE DECLARATION***
+	signal(SIGINT, ctrlCHandler);
+	signal(SIGCHLD, childTermHandler);
+	programName = argv[0];
 	maxTime = 100;
 	slaves = 0;
 	int opt;
