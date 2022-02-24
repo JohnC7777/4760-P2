@@ -25,6 +25,8 @@ const int SHM_PERM = 0666;
 
 
 char *getOutputPerror();
+void childTermHandler(int);
+void ctrlCHandler(int);
 
 int main (int argc, char *argv[]) {
 	signal(SIGINT, ctrlCHandler);
