@@ -72,3 +72,8 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
  
    return 0;
 }
+char *getOutputPerror () {
+	char* output = strdup(programName);
+	strcat(output, ": Error");
+	return output;
+}
