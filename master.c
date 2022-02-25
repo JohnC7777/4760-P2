@@ -54,7 +54,7 @@ int main (int argc, char *argv[]) {
 	maxTime = 100;
 	slaves = 0;
 	Processes = 0;
-	int opt
+	int opt;
 	int shmAllocated=0;
 	
 
