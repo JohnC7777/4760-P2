@@ -175,17 +175,22 @@ int deallocateSharedMemory() {
 	return 0;
 }
 
-void endProgram (int s) {
-	int i;
-	for (i = 0; i < slaves; i++) {
-		if ((kill(children[i], SIGKILL)) == -1) {
-			char *output = getPerror();
-			perror(output);
+
+
+void endProgram (int s, int killChild) {
+	if (killChild) {
+		int i;
+		for (i = 0; i < slaves; i++) {
+			if ((kill(children[i], SIGKILL)) == -1) {
+				char *output = getPerror();
+				perror(output);
+			}
 		}
 	}
 	if (shmAllocated) deallocateSharedMemory();
 	exit(0);
 }
+
 
 static int timersetup(void) {
 	struct itimerval value;
