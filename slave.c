@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
 	
 	int randNumsLower = 1;
 	int randNumsUpper = 5;
-  int randNums;
+  	int randNums;
 	srand(time(0) * procNum); 
 	
 	shmp = shmat(shmid, NULL, 0);
@@ -38,7 +38,6 @@ int main (int argc, char *argv[]) {
 		exit(1);
 	}
 	
-	/* Set logfile name */
 	char intToString[3];
 	sprintf(intToString, "%d", procNum);
 	char logfile[10] = "logfile.";
@@ -48,17 +47,17 @@ int main (int argc, char *argv[]) {
 	                //Bakery's algorithm
 	int i = 0;
 	for (i = 0; i < 5; i++) {
-		logMessage("Requested to join critical section by process number: ", procNum, logfile);
+		logMessage("Request to enter critical section. process #: ", procNum, logfile);
 		lock(procNum - 1); 
-		logMessage("Entered critical section by process number: ", procNum, logfile);
+		logMessage("Critical section entered. process #: ", procNum, logfile);
 		randNums = (rand() % (randNumsUpper - randNumsLower + 1)) + randNumsLower; 
 		sleep(randNums);
 		use_resource(procNum - 1);
-		logMessage("Wrote in 'cstest' file by process number: ", procNum, logfile);
+		logMessage("Data entry in 'cstest' file. process #: ", procNum, logfile);
 		randNums = (rand() % (randNumsUpper - randNumsLower + 1)) + randNumsLower;
 		sleep(randNums);
-		logMessage("Exited critical section by process number: ", procNum, logfile);
-		unlock(procNum - 1); /* Exit critical section */
+		logMessage("Critical section exited. process #: ", procNum, logfile);
+		unlock(procNum - 1);
 	}
 	
 	
@@ -111,18 +110,18 @@ void use_resource(int procNum) {
 	}
 	shmp->source = procNum;
 	int realProcNum = procNum + 1;
-	printf("%d using resource...\n", realProcNum);
+	printf("%d in use...\n", realProcNum);
 	
 	time_t rawtime;
 	struct tm * timeinfo;
 	FILE *fptr = fopen("cstest", "a");
 	if (fptr == NULL) {
-		printf("Error: unable to open cstest file.\n");
+		printf("Error: cant open cstest file.\n");
 		exit(0);
 	}
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-	fprintf(fptr, "%d:%d:%d Queue %d File modified by process number %d\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, shmp->tickets[procNum], realProcNum);
+	fprintf(fptr, "%d:%d:%d Queue %d modified by process # %d\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, shmp->tickets[procNum], realProcNum);
 	fclose(fptr);
 	
 	MEMBAR;
@@ -136,6 +135,7 @@ char *getPerror(char *programName) {
 	return output;
 }
 
+//LOGGING MESSAGE FUNCTION
 void logMessage(char *message, int procNum, char *fileName) {
 	time_t rawtime;
         struct tm * timeinfo;
@@ -143,7 +143,7 @@ void logMessage(char *message, int procNum, char *fileName) {
         timeinfo = localtime(&rawtime);
 	FILE *fptr = fopen(fileName, "a");
         if (fptr == NULL) {
-                printf("Error: unable to open log file.\n");
+                printf("Error: cant open log file.\n");
                 exit(0);
         }
         fprintf(fptr, "%d:%d:%d %s%d\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, message, procNum);
