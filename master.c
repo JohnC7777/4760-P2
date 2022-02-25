@@ -14,7 +14,7 @@
 #include <time.h>
 #include "config.h"
 
-pid_t children[N_PROCS];
+pid_t children[NUM_OF_PROCS];
 int maxTime;
 int slaves;
 int shmAllocated;
@@ -29,8 +29,8 @@ const int SHM_PERM = 0666;
 
 struct shmseg {
 	int source;
-	int tickets[N_PROCS];
-	int choosing[N_PROCS];
+	int tickets[NUM_OF_PROCS];
+	int choosing[NUM_OF_PROCS];
 };
 
 
@@ -72,8 +72,8 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 
 	case'n':
 	slaves = atoi(optarg);
-	if(slaves>N_PROCS){
-		printf("Slaves cannot be more than "N_PROCS" \n");
+	if(slaves>NUM_OF_PROCS){
+		printf("Slaves cannot be more than "NUM_OF_PROCS" \n");
 		slaves = 0;
 		exit(0);
 	}
@@ -100,7 +100,7 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 	}
 	
 	shmp->source = 0;
-        for (i = 0; i < N_PROCS; i++) {
+        for (i = 0; i < NUM_OF_PROCS; i++) {
                 shmp->tickets[i] = 0;
                 shmp->choosing[i] = 0;
         }
