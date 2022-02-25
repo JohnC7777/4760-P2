@@ -13,22 +13,36 @@
 #include <sys/time.h>
 #include "config.h"
 
+pid_t children[N_PROCS];
 int maxTime;
 int slaves;
 int shmAllocated;
 int shmid;
 void *shmp;
 char *programName;
-int activeProcesses;
+int Processes;
 const int SHM_KEY = 777;
 const int SHM_SIZE = 1024;
 const int SHM_PERM = 0666;
 
 
-char *getOutputPerror();
+int isNum(char*);
+char *getPerror();
+int deallocateSharedMemory();
+void endProgram(int);
 void childTermHandler(int);
 void ctrlCHandler(int);
-void logTermination(char*);
+void logTerm(char*);
+static void timeoutHandler(int);
+static int interruptsetup(void);
+static int timersetup(void);
+struct shmseg *shmp;
+
+struct shmseg {
+	int source;
+	int tickets[N_PROCS];
+	int choosing[N_PROCS];
+};
 
 int main (int argc, char *argv[]) {
 	signal(SIGINT, ctrlCHandler);
@@ -36,7 +50,7 @@ int main (int argc, char *argv[]) {
 	programName = argv[0];
 	maxTime = 100;
 	slaves = 0;
-	activeProcesses = 0;
+	Processes = 0;
 	int opt;
 	void *shmp;
 	int shmAllocated=0;
@@ -47,14 +61,14 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 	switch(opt){
 			
 	case'h':
-	printf("Usage:\nchain [-h] [-n nprocs] [-t ss maxTime] \nnprocs Number of processes \nmaxTime maximum time in seconds (default 100 seconds) after which the process should terminate itself if not completed. \n");
+	printf("Usage:\nchain [-h] [-n numOfProcs(slaves)] [-t ss maxTime] \nnumOfProcs(slaves) Number of processes \nmaxTime maximum time in seconds (default 100 seconds) after which the process should terminate itself if not completed. \n");
 	return 0;
 	break;
 
 	case'n':
 	slaves = atoi(optarg);
-	if(slaves>20){
-		printf("Slaves cannot be more than 20\n");
+	if(slaves>N_PROCS){
+		printf("Slaves cannot be more than "N_PROCS" \n");
 		slaves = 0;
 		exit(0);
 	}
@@ -64,40 +78,147 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 	maxTime = atoi(optarg);
       }
    }
-	shmid = shmget(SHM_KEY, SHM_SIZE, SHM_PERM|IPC_CREAT);
+	shmAllocated = 1;
+	
+	shmid = shmget(SHM_KEY, sizeof(struct shmseg), SHM_PERM|IPC_CREAT);
 	if (shmid == -1) {
-		char *output = getOutputPerror();
+		char *output = getPerror();
 		perror(output);
 		return 1;
 	}
 	
 	shmp = shmat(shmid, NULL, 0);
 	if (shmp == (void *) -1) {
-		char *output = getOutputPerror();
+		char *output = getPerror();
 		perror(output);
 		return 1;
-	}  
- 
+	}
+	
+	shmp->source = 0;
+        for (i = 0; i < N_PROCS; i++) {
+                shmp->tickets[i] = 0;
+                shmp->choosing[i] = 0;
+        }
+ 	
+	pid_t childpid = 0;
+	for (i = 0; i < slaves; i++) {
+		if ((childpid = fork()) == -1) {
+			char *output = getPerror();
+			perror(output);
+			return 1;
+		} else if (childpid == 0) {
+			char strProcNum[10];
+			sprintf(strProcNum, "%d", i);
+			char strShmid[100];
+			sprintf(strShmid, "%d", shmid);
+			char *args[] = {"./slave", strProcNum, strShmid, (char*)0};
+			execvp("./slave", args);
+			
+			char *output = getPerror();
+			perror(output);
+			return 1;
+		} else {
+			Processes++;
+			children[i] = childpid;
+		}
+	}
+	
+	if (setupinterrupt() == -1) {
+		char *output = getPerror();
+		perror(output);
+		return 1;
+	}
+	if (setupitimer() == -1) {
+		char *output = getPerror();
+		perror(output);
+		return 1;
+	}
+	for( ; ; );
+	
    return 0;
 }
-void childTermHandler(int s) {
-	activeProcesses--;
-	if (activeProcesses < 1) {
-		printf("All children have terminated. Now exiting program...\n");
-		logTermination("all children terminated");
-		endProgramHandler(1);
-	}		
+int isNum (char *str) {
+	int i;
+	for (i = 0; i < strlen(str); i++) {
+		if (!isdigit(str[i])) return 0;
+	}
+	return 1;
 }
-void ctrlCHandler(int s) {
-	logTermination("ctrl+C");
-	endProgramHandler(1);
-}
-char *getOutputPerror () {
+
+char *getPerror () {
 	char* output = strdup(programName);
 	strcat(output, ": Error");
 	return output;
 }
-void logTermination(char *method) {
+
+int deallocateSharedMemory() {
+	int returnValue;
+	printf("Deallocating shared memory...\n");
+	returnValue = shmdt(shmp);
+	if (returnValue == -1) {
+		char *output = getPerror();
+		perror(output);
+		exit(1);
+	}
+	
+	returnValue = shmctl(shmid, IPC_RMID, NULL);
+	if (returnValue == -1) {
+		char *output = getPerror();
+		perror(output);
+		exit(1);
+	}
+
+	return 0;
+}
+
+void endProgram (int s) {
+	int i;
+	for (i = 0; i < slaves; i++) {
+		if ((kill(children[i], SIGKILL)) == -1) {
+			char *output = getPerror();
+			perror(output);
+		}
+	}
+	if (shmAllocated) deallocateSharedMemory();
+	exit(0);
+}
+
+static int timersetup(void) {
+	struct itimerval value;
+	value.it_interval.tv_sec = maxTime;
+	value.it_interval.tv_usec = 0;
+	value.it_value = value.it_interval;
+	return (setitimer(ITIMER_PROF, &value, NULL));
+}
+
+static int interruptsetup(void) {
+	struct sigaction act;
+	act.sa_handler = timeoutHandler;
+	act.sa_flags = 0;
+	return (sigemptyset(&act.sa_mask) || sigaction(SIGPROF, &act, NULL));
+}
+
+void ctrlCHandler(int s) {
+	logTerm("ctrl+C");
+	endProgram(1);
+}
+
+static void timeoutHandler(int s) {
+	printf("Timer ended. Now exiting program...\n");
+	logTerm("timeout");
+	endProgram(1);
+}
+
+void childTermHandler(int s) {
+	Processes--;
+	if (Processes < 1) {
+		printf("All children have terminated. Now exiting program...\n");
+		logTerm("all children terminated");
+		endProgram(1);
+	}		
+}
+
+void logTerm(char *method) {
 	time_t rawtime;
 	struct tm * timeinfo;
 	time(&rawtime);
