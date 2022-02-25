@@ -1,13 +1,16 @@
 C		= gcc
 CFLAGS		= -g
-TARGET		= master
-OBJECTS		= master.o
+TARGET		= master slave
+OBJECTS		= master.o slave.o
 .SUFFIXES: .c .o
 
 $(TARGET): $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS)
 
 .c.o: master.c
+	$(CC) $(CFLAGS) -c $<
+	
+.c.o: slave.c
 	$(CC) $(CFLAGS) -c $<
 
 .PHONY: clean
