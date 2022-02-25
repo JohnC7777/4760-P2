@@ -133,7 +133,6 @@ void use_resource(int procNum) {
 char *getPerror(char *programName) {
 	char* output = strdup(programName);
 	strcat(output, ": Error");
-	printf("TEST from slave");  //***********************************REMOVE
 	return output;
 }
 
