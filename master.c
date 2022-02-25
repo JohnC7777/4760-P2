@@ -18,12 +18,19 @@ int maxTime;
 int slaves;
 int shmAllocated;
 int shmid;
-void *shmp;
 char *programName;
 int Processes;
+int currentlyTerminating;
+struct shmseg *shmp;
 const int SHM_KEY = 777;
 const int SHM_SIZE = 1024;
 const int SHM_PERM = 0666;
+
+struct shmseg {
+	int source;
+	int tickets[N_PROCS];
+	int choosing[N_PROCS];
+};
 
 
 int isNum(char*);
@@ -38,11 +45,7 @@ static int interruptsetup(void);
 static int timersetup(void);
 struct shmseg *shmp;
 
-struct shmseg {
-	int source;
-	int tickets[N_PROCS];
-	int choosing[N_PROCS];
-};
+
 
 int main (int argc, char *argv[]) {
 	signal(SIGINT, ctrlCHandler);
@@ -51,8 +54,7 @@ int main (int argc, char *argv[]) {
 	maxTime = 100;
 	slaves = 0;
 	Processes = 0;
-	int opt;
-	void *shmp;
+	int opt
 	int shmAllocated=0;
 	
 
