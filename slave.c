@@ -1,11 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <getopt.h>
 #include <string.h>
 #include <time.h>
 #include <sys/shm.h>
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 void lock(int);
 void use_resource(int);
