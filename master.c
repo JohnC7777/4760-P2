@@ -45,7 +45,6 @@ static void timeoutHandler(int);
 static int interruptsetup(void);
 static int timersetup(void);
 struct shmseg *shmp;
-static int setupinterrupt(void);
 
 
 
@@ -129,7 +128,7 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 		}
 	}
 	
-	if (setupinterrupt() == -1) {
+	if (interruptsetup() == -1) {
 		char *output = getPerror();
 		perror(output);
 		return 1;
