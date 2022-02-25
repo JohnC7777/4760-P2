@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/time.h>
+#include <time.h>
 #include "config.h"
 
 pid_t children[N_PROCS];
