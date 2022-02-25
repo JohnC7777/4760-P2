@@ -157,41 +157,6 @@ char *getPerror () {
 	return output;
 }
 
-int deallocateSharedMemory() {
-	int returnValue;
-	printf("Deallocating shared memory...\n");
-	returnValue = shmdt(shmp);
-	if (returnValue == -1) {
-		char *output = getPerror();
-		perror(output);
-		exit(1);
-	}
-	
-	returnValue = shmctl(shmid, IPC_RMID, NULL);
-	if (returnValue == -1) {
-		char *output = getPerror();
-		perror(output);
-		exit(1);
-	}
-
-	return 0;
-}
-
-
-
-void endProgram (int s, int killChild) {
-	if (killChild) {
-		int i;
-		for (i = 0; i < slaves; i++) {
-			if ((kill(children[i], SIGKILL)) == -1) {
-				char *output = getPerror();
-				perror(output);
-			}
-		}
-	}
-	if (shmAllocated) deallocateSharedMemory();
-	exit(0);
-}
 
 
 static int timersetup(void) {
@@ -246,3 +211,37 @@ void logTerm(char *method) {
 	}
 	fprintf(fptr, "%d:%d:%d Program ended. Termination method: %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, method);
 }	
+
+int deallocateSharedMemory() {
+	int returnValue;
+	printf("Deallocating shared memory...\n");
+	returnValue = shmdt(shmp);
+	if (returnValue == -1) {
+		char *output = getPerror();
+		perror(output);
+		exit(1);
+	}
+	
+	returnValue = shmctl(shmid, IPC_RMID, NULL);
+	if (returnValue == -1) {
+		char *output = getPerror();
+		perror(output);
+		exit(1);
+	}
+
+	return 0;
+}
+
+void endProgram (int s, int killChild) {
+	if (killChild) {
+		int i;
+		for (i = 0; i < slaves; i++) {
+			if ((kill(children[i], SIGKILL)) == -1) {
+				char *output = getPerror();
+				perror(output);
+			}
+		}
+	}
+	if (shmAllocated) deallocateSharedMemory();
+	exit(0);
+}
