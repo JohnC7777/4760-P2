@@ -107,7 +107,7 @@ void unlock(int procNum) {
 //CRITICAL SECTION
 void use_resource(int procNum) {
 	if (shmp->source != 0) {
-		printf("Resource was acquired by %d, but is still in-use by %d!\n", procNum, shmp->resource);
+		printf("Resource was acquired by %d, but is still in-use by %d!\n", procNum, shmp->source);
 	}
 	shmp->source = procNum;
 	int realProcNum = procNum + 1;
