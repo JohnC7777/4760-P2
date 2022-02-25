@@ -133,7 +133,7 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 		perror(output);
 		return 1;
 	}
-	if (setupitimer() == -1) {
+	if (timersetup() == -1) {
 		char *output = getPerror();
 		perror(output);
 		return 1;
