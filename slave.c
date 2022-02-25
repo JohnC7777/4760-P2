@@ -122,7 +122,7 @@ void use_resource(int procNum) {
 	}
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
-	fprintf(fptr, "%d:%d:%d Queue %d File modified by process number %d\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, shmp->tickets[procNumber], realProcNumber);
+	fprintf(fptr, "%d:%d:%d Queue %d File modified by process number %d\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, shmp->tickets[procNum], realProcNum);
 	fclose(fptr);
 	
 	MEMBAR;
