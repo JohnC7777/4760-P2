@@ -89,7 +89,6 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 	if (shmid == -1) {
 		char *output = getPerror();
 		perror(output);
-		printf("TEST from shmget");
 		return 1;
 	}
 	
@@ -97,7 +96,6 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 	if (shmp == (void *) -1) {
 		char *output = getPerror();
 		perror(output);
-		printf("TEST from shmp");
 		return 1;
 	}
 	
@@ -112,7 +110,6 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 		if ((childpid = fork()) == -1) {
 			char *output = getPerror();
 			perror(output);
-			printf("TEST from fork");
 			return 1;
 		} else if (childpid == 0) {
 			char strProcNum[10];
@@ -157,7 +154,6 @@ int isNum (char *str) {
 char *getPerror () {
 	char* output = strdup(programName);
 	strcat(output, ": Error");
-	printf("TEST from master");
 	return output;
 }
 
