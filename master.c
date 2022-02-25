@@ -88,7 +88,6 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 	shmid = shmget(SHM_KEY, sizeof(struct shmseg), SHM_PERM|IPC_CREAT);
 	if (shmid == -1) {
 		char *output = getPerror();
-		printf("TEST");
 		perror(output);
 		return 1;
 	}
@@ -154,6 +153,7 @@ int isNum (char *str) {
 char *getPerror () {
 	char* output = strdup(programName);
 	strcat(output, ": Error");
+	printf("TEST from master");
 	return output;
 }
 
