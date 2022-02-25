@@ -36,7 +36,7 @@ struct shmseg {
 int isNum(char*);
 char *getPerror();
 int deallocateSharedMemory();
-void endProgram(int);
+void endProgram(int, int);
 void childTermHandler(int);
 void ctrlCHandler(int);
 void logTerm(char*);
