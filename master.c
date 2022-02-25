@@ -56,6 +56,7 @@ int main (int argc, char *argv[]) {
 	Processes = 0;
 	int opt;
 	int shmAllocated=0;
+	int i;
 	
 
    //***GETOPT***
