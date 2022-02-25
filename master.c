@@ -73,7 +73,7 @@ while((opt = getopt(argc, argv, "hn:t:")) != -1){
 	case'n':
 	slaves = atoi(optarg);
 	if(slaves>NUM_OF_PROCS){
-		printf("Slaves cannot be more than "NUM_OF_PROCS" \n");
+		printf("Slaves cannot be more than 20 \n");
 		slaves = 0;
 		exit(0);
 	}
