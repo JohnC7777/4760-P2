@@ -16,8 +16,8 @@ void logMessage(char*, int, char*);
 
 struct shmseg {
 	int source;
-	int tickets[N_PROCS];
-	int choosing[N_PROCS];
+	int tickets[NUM_OF_PROCS];
+	int choosing[NUM_OF_PROCS];
 };
 struct shmseg *shmp;
 
@@ -72,7 +72,7 @@ void lock(int procNum) {
 	int max_ticket = 0;
 
 	int i;
-	for (i = 0; i < MAX_PROCS; ++i) {
+	for (i = 0; i < NUM_OF_PROCS; ++i) {
 		int ticket = shmp->tickets[i];
 		max_ticket = ticket > max_ticket ? ticket : max_ticket;
 	}
@@ -84,7 +84,7 @@ void lock(int procNum) {
 	MEMBAR;
 	
 	int other;
-	for (other = 0; other < MAX_PROCS; ++other) {
+	for (other = 0; other < NUM_OF_PROCS; ++other) {
 		
 		while (shmp->choosing[other]) {
 		}
@@ -106,10 +106,10 @@ void unlock(int procNum) {
 
 //CRITICAL SECTION
 void use_resource(int procNum) {
-	if (shmp->resource != 0) {
+	if (shmp->source != 0) {
 		printf("Resource was acquired by %d, but is still in-use by %d!\n", procNum, shmp->resource);
 	}
-	shmp->resource = procNum;
+	shmp->source = procNum;
 	int realProcNum = procNum + 1;
 	printf("%d using resource...\n", realProcNum);
 	
@@ -127,7 +127,7 @@ void use_resource(int procNum) {
 	
 	MEMBAR;
 	
-	shmp->resource = 0;
+	shmp->source = 0;
 }
 
 char *getPerror(char *programName) {
