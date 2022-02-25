@@ -45,6 +45,7 @@ static void timeoutHandler(int);
 static int interruptsetup(void);
 static int timersetup(void);
 struct shmseg *shmp;
+static int setupinterrupt(void);
 
 
 
