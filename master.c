@@ -54,6 +54,7 @@ int main (int argc, char *argv[]) {
 	maxTime = 100;
 	slaves = 0;
 	Processes = 0;
+	currentlyTerminating=0;
 	int opt;
 	int shmAllocated=0;
 	int i;
@@ -201,25 +202,30 @@ static int interruptsetup(void) {
 	return (sigemptyset(&act.sa_mask) || sigaction(SIGPROF, &act, NULL));
 }
 
+
 void ctrlCHandler(int s) {
+	currentlyTerminating = 1;
 	logTerm("ctrl+C");
-	endProgram(1);
+	endProgram(1, 1);
 }
 
 static void timeoutHandler(int s) {
+	currentlyTerminating = 1;
 	printf("Timer ended. Now exiting program...\n");
 	logTerm("timeout");
-	endProgram(1);
+	endProgram(1, 1);
 }
+
 
 void childTermHandler(int s) {
 	Processes--;
-	if (Processes < 1) {
+	if (Processes < 1 && !currentlyTerminating) {
 		printf("All children have terminated. Now exiting program...\n");
 		logTerm("all children terminated");
-		endProgram(1);
+		endProgram(1, 0);
 	}		
 }
+
 
 void logTerm(char *method) {
 	time_t rawtime;
